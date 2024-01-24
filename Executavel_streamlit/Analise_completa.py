@@ -37,8 +37,11 @@ st.write(analise_economica)
 
 # dados exportados do site da vinícola
 
-df = pd.read_csv(".\\ExpVinho.csv", sep=";") 
-df.head()
+try:
+    st.write('Trying with back slashes')
+    st.dataframe(pd.read_csv(r'.\\ExpVinho.csv"'))
+except:
+    st.write('It didn\'t work with back slashes.')
 
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
