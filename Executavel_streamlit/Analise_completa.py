@@ -37,13 +37,13 @@ st.write(analise_economica)
 
 # dados exportados do site da vinícola
 
-df = pd.read_csv(r'.\\ExpVinho.csv')
+df = pd.read_csv(r'.ExpVinho.csv')
 
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
 # Dash: Country Profile; Dimension: Population aged 20 and over (thousands); Período: 2008 - 2022
 
-df_demografico_pop_20_mais = pd.read_excel(r'.\\Demografico_Pop_Idade_20_mais.csv')
+df_demografico_pop_20_mais = pd.read_excel(r'.Demografico_Pop_Idade_20_mais.csv')
 
 # Carregando o arquivo
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://www.paho.org/en/enlace/alcohol-consumption
