@@ -37,7 +37,9 @@ st.write(analise_economica)
 
 # dados exportados do site da vinícola
 
-df = pd.read_csv('CSV_File\\ExpVinho.csv')
+caminho_csv = "https://github.com/Wellington8962/tech-challenge-01-streamlit/blob/main/Executavel_streamlit/ExpVinho.csv"
+
+df = pd.read_csv(caminho_csv, sep=";")
 
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
