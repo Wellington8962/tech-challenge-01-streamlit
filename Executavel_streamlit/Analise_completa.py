@@ -39,7 +39,7 @@ st.write(analise_economica)
 
 try:
     st.write('Trying with back slashes')
-    st.dataframe(pd.read_csv(r'.\\ExpVinho.csv"'))
+    st.dataframe(pd.read_csv(r'.\\ExpVinho.csv'))
 except:
     st.write('It didn\'t work with back slashes.')
 
@@ -47,7 +47,11 @@ except:
 # Home Core Indicators
 # Dash: Country Profile; Dimension: Population aged 20 and over (thousands); Período: 2008 - 2022
 
-df_demografico_pop_20_mais = pd.read_excel("Demografico_Pop_Idade_20_mais.xlsx") 
+try:
+    st.write('Trying with back slashes')
+    st.dataframe(pd.read_csv(r'.\\Demografico_Pop_Idade_20_mais.xlsx'))
+except:
+    st.write('It didn\'t work with back slashes.')
 
 # Carregando o arquivo
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://www.paho.org/en/enlace/alcohol-consumption
