@@ -15,28 +15,19 @@ from io import StringIO
 from datetime import date
 from matplotlib.ticker import FuncFormatter
 
-import streamlit as st
-from PIL import Image
-import requests
-from io import BytesIO
+# URL do arquivo CSV no GitHub
+csv_url = "https://github.com/Wellington8962/tech-challenge-01-streamlit/raw/main/Executavel_streamlit/CSV_Files/ExpVinho.csv"
 
-# URL da imagem no GitHub
-image_url = "https://github.com/streamlit/cloud-example-apps/raw/main/images/Annotations.png"
+# Função para carregar um arquivo CSV a partir de uma URL
+def load_csv(url):
+    df = pd.read_csv(url)
+    return df
 
-# Função para carregar uma imagem a partir de uma URL
-def load_image(url):
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
-    return img
+# Carregar o DataFrame usando a função
+df = load_csv(csv_url)
 
-# Carregar a imagem usando a função
-image = load_image(image_url)
-
-# Exibir a imagem usando Streamlit
-st.image(image, caption='Imagem do GitHub', use_column_width=True)
-
-# Adicionar algum texto abaixo da imagem
-st.write("Esta é uma imagem carregada do GitHub usando Streamlit.")
+# Exibir o DataFrame usando Streamlit
+st.dataframe(df)
 
 # Título
 st.title('Aspectos Macroeconômicos das Exportações de Vinho no Brasil')
