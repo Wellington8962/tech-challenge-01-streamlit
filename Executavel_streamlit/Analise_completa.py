@@ -15,6 +15,29 @@ from io import StringIO
 from datetime import date
 from matplotlib.ticker import FuncFormatter
 
+import streamlit as st
+from PIL import Image
+import requests
+from io import BytesIO
+
+# URL da imagem no GitHub
+image_url = "https://github.com/streamlit/cloud-example-apps/raw/main/images/Annotations.png"
+
+# Função para carregar uma imagem a partir de uma URL
+def load_image(url):
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    return img
+
+# Carregar a imagem usando a função
+image = load_image(image_url)
+
+# Exibir a imagem usando Streamlit
+st.image(image, caption='Imagem do GitHub', use_column_width=True)
+
+# Adicionar algum texto abaixo da imagem
+st.write("Esta é uma imagem carregada do GitHub usando Streamlit.")
+
 # Título
 st.title('Aspectos Macroeconômicos das Exportações de Vinho no Brasil')
 
