@@ -36,32 +36,31 @@ st.write(analise_economica)
 # CARREGANDO ARQUIVOS A SEREM UTILIZADOS
 
 # dados exportados do site da vinícola
-file_name = "./CSV_FILES/ExpVinho.csv"
-df = pd.read_csv(file_name, sep=";") # Alterar para o caminho do arquivo em seu diretorio
-#df = pd.read_csv('/home/wellington/Documents/FIAP/Pos-Tech_Data-Analytics/Tech_Challenge/ExpVinho.csv', sep=";") # Alterar para o caminho do arquivo em seu diretorio
+
+df = pd.read_csv("ExpVinho.csv", sep=";") 
 df.head()
 
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
 # Dash: Country Profile; Dimension: Population aged 20 and over (thousands); Período: 2008 - 2022
-file_name = "./CSV_FILES/Demografico_Pop_Idade_20_mais.xlsx"
-df_demografico_pop_20_mais = pd.read_excel(file_name) 
+
+df_demografico_pop_20_mais = pd.read_excel("Demografico_Pop_Idade_20_mais.xlsx") 
 
 # Carregando o arquivo
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://www.paho.org/en/enlace/alcohol-consumption
 # Home  ENLACE: Data Portal on Noncommunicable Diseases, Mental Health, and External Causes  Alcohol consumption
 # Dash: Level of alcohol consumption; Country: Paraguay and EUA
-file_name = "./CSV_FILES/Consumo_Alcool_Paraguay_EUA.xlsx"
-df_consumo_alcool_litros_paraguay_eua = pd.read_excel(file_name) 
+
+df_consumo_alcool_litros_paraguay_eua = pd.read_excel("Consumo_Alcool_Paraguay_EUA.xlsx") 
 
 # Comunicado ténico 226 - Vitivinicultura Brasileira: panorama 2021
 # fonte https://ainfo.cnptia.embrapa.br/digital/bitstream/doc/1149674/1/Com-Tec-226.pdf
-file_name = "./CSV_FILES/Viticultura_brasileira.xlsx"
-df_br_estado_producao_uvas_ton = pd.read_excel(file_name) 
+
+df_br_estado_producao_uvas_ton = pd.read_excel("Viticultura_brasileira.xlsx") 
 
 # dados sobre importação do paraguay de vinho provindo do Brasil - fonte Paraguai2021.pdf
-file_name = "./CSV_FILES/import_vinhos_br.xlsx"
-dados_import_vinhos_br = pd.read_excel(file_name)
+
+dados_import_vinhos_br = pd.read_excel("import_vinhos_br.xlsx")
 
 # TRATAMENTO DE DADOS
 years = list(range(2008, 2023))
@@ -758,13 +757,8 @@ from datetime import date
 
 # IMPORTANDO DADOS
 
-# lucas\\TECH_CHALLENGE_1\\TAXA_CAMBIO_HISTORICO.csv
-caminho = "CSV_FILES/TAXA_CAMBIO_HISTORICO.csv"
-dados = pd.read_csv(caminho, encoding='ISO-8859-1', skiprows=0, sep=';', skipfooter=12, thousands='.', decimal=',', engine ="python")
-
-# lucas\\TECH_CHALLENGE_1\\ExpVinho.csv"
-file_name = "CSV_FILES/ExpVinho.csv"
-dados_vinho = pd.read_csv(file_name, sep=";") # Alterar para o caminho do arquivo em seu diretorio
+dados = pd.read_csv("TAXA_CAMBIO_HISTORICO.csv", encoding='ISO-8859-1', skiprows=0, sep=';', skipfooter=12, thousands='.', decimal=',', engine ="python")
+dados_vinho = pd.read_csv("ExpVinho.csv", sep=";") 
 
 # RENOMEANDO COLUNAS
 primeira_coluna = dados.columns[0]
