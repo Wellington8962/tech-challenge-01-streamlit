@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.542">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>alegrete</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="Alegrete_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Alegrete_files/libs/quarto-html/quarto.js"></script>
+<script src="Alegrete_files/libs/quarto-html/popper.min.js"></script>
+<script src="Alegrete_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Alegrete_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Alegrete_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Alegrete_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Alegrete_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Alegrete_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Alegrete_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Dados climáticos da cidade de Alegrete, RS (2007 - 2022)</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Fonte: INMET - Instituto Nacional de Meteorologia (https://portal.inmet.gov.br/dadoshistoricos)</p>
+<div id="3c924f64" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bibliotecas</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.dates <span class="im">import</span> DateFormatter, MonthLocator, YearLocator</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="6057f7fd" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista de nomes dos arquivos</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data_set_files <span class="op">=</span> [</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2007/INMET_S_RS_A826_ALEGRETE_01-01-2007_A_31-12-2007.CSV"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2008/INMET_S_RS_A826_ALEGRETE_01-01-2008_A_31-12-2008.CSV"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2009/INMET_S_RS_A826_ALEGRETE_01-01-2009_A_31-12-2009.CSV"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2010/INMET_S_RS_A826_ALEGRETE_01-01-2010_A_31-12-2010.CSV"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2011/INMET_S_RS_A826_ALEGRETE_01-01-2011_A_31-12-2011.CSV"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2012/INMET_S_RS_A826_ALEGRETE_01-01-2012_A_31-12-2012.CSV"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2013/INMET_S_RS_A826_ALEGRETE_01-01-2013_A_31-12-2013.CSV"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2014/INMET_S_RS_A826_ALEGRETE_01-01-2014_A_31-12-2014.CSV"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2015/INMET_S_RS_A826_ALEGRETE_01-01-2015_A_31-12-2015.CSV"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2016/INMET_S_RS_A826_ALEGRETE_01-01-2016_A_31-12-2016.CSV"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2017/INMET_S_RS_A826_ALEGRETE_01-01-2017_A_31-12-2017.CSV"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2018/INMET_S_RS_A826_ALEGRETE_01-01-2018_A_31-12-2018.CSV"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2019/INMET_S_RS_A826_ALEGRETE_01-01-2019_A_31-12-2019.CSV"</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2020/INMET_S_RS_A826_ALEGRETE_01-01-2020_A_31-12-2020.CSV"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2021/INMET_S_RS_A826_ALEGRETE_01-01-2021_A_31-12-2021.CSV"</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../Alegrete/2022/INMET_S_RS_A826_ALEGRETE_01-01-2022_A_31-12-2022.CSV"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista para armazenar os DataFrames</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>dfs <span class="op">=</span> []</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> file_path <span class="kw">in</span> data_set_files:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_csv(file_path, encoding<span class="op">=</span><span class="st">"ISO-8859-1"</span>, skiprows<span class="op">=</span><span class="dv">8</span>, sep<span class="op">=</span><span class="st">";"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Excluir as colunas pelos índices</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop(df.columns[[<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">11</span>, <span class="dv">12</span>, <span class="dv">13</span>, <span class="dv">14</span>, <span class="dv">15</span>, <span class="dv">16</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">19</span>]], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    dfs.append(df)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Renomeando a coluna de índice 1 para "DATA (YYYY-MM-DD)" </span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> df <span class="kw">in</span> dfs[<span class="op">-</span><span class="dv">4</span>:]:</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    df.rename(columns<span class="op">=</span>{<span class="st">"Data"</span>: <span class="st">"DATA (YYYY-MM-DD)"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertendo a coluna 'DATA (YYYY-MM-DD)' para datetime</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, df <span class="kw">in</span> <span class="bu">enumerate</span>(dfs):</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&gt;=</span> <span class="bu">len</span>(dfs) <span class="op">-</span> <span class="dv">4</span>:</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Para os últimos quatro DataFrames</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'DATA (YYYY-MM-DD)'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'DATA (YYYY-MM-DD)'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y/%m/</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Para os demais DataFrames</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'DATA (YYYY-MM-DD)'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'DATA (YYYY-MM-DD)'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Concatenando todos os DataFrames em um único DataFrame</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> pd.concat(dfs, ignore_index<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="d3f52acb" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_final</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">DATA (YYYY-MM-DD)</th>
+<th data-quarto-table-cell-role="th">PRECIPITAÇÃO TOTAL, HORÁRIO (mm)</th>
+<th data-quarto-table-cell-role="th">TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)</th>
+<th data-quarto-table-cell-role="th">TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2007-01-01</td>
+<td>0</td>
+<td>29,4</td>
+<td>28,5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2007-01-01</td>
+<td>0</td>
+<td>28,9</td>
+<td>27,8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2007-01-01</td>
+<td>0</td>
+<td>28,1</td>
+<td>27,6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2007-01-01</td>
+<td>0</td>
+<td>28</td>
+<td>27,1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2007-01-01</td>
+<td>0</td>
+<td>27,2</td>
+<td>25,9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">140251</td>
+<td>2022-12-31</td>
+<td>0</td>
+<td>36,8</td>
+<td>35,7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">140252</td>
+<td>2022-12-31</td>
+<td>0</td>
+<td>36,7</td>
+<td>35,8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">140253</td>
+<td>2022-12-31</td>
+<td>0</td>
+<td>36,4</td>
+<td>35,1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">140254</td>
+<td>2022-12-31</td>
+<td>0</td>
+<td>35,1</td>
+<td>33,6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">140255</td>
+<td>2022-12-31</td>
+<td>0</td>
+<td>33,6</td>
+<td>30,9</td>
+</tr>
+</tbody>
+</table>
+
+<p>140256 rows × 4 columns</p>
+</div>
+</div>
+</div>
+<div id="11a3c703" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Substituindo vírgulas por pontos e conversão para float</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)'</span>] <span class="op">=</span> df_final[<span class="st">'TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)'</span>].<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">'.'</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)'</span>] <span class="op">=</span> df_final[<span class="st">'TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)'</span>].<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">'.'</span>).astype(<span class="bu">float</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'PRECIPITAÇÃO TOTAL, HORÁRIO (mm)'</span>] <span class="op">=</span> df_final[<span class="st">'PRECIPITAÇÃO TOTAL, HORÁRIO (mm)'</span>].<span class="bu">str</span>.replace(<span class="st">','</span>, <span class="st">'.'</span>).astype(<span class="bu">float</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="5a7b2d58" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando uma nova coluna para a temperatura mediana diária</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'TEMPERATURA_MEDIANA_DIA'</span>] <span class="op">=</span> df_final[[<span class="st">'TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)'</span>, <span class="st">'TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)'</span>]].median(axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="38cfa40c" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Agregando os dados mensais para temperatura mediana</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_temp_mes <span class="op">=</span> df_final[df_final[<span class="st">'TEMPERATURA_MEDIANA_DIA'</span>] <span class="op">&gt;=</span> <span class="dv">0</span>].resample(<span class="st">'MS'</span>, on<span class="op">=</span><span class="st">'DATA (YYYY-MM-DD)'</span>).median().reset_index()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df_temp_mes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">DATA (YYYY-MM-DD)</th>
+<th data-quarto-table-cell-role="th">PRECIPITAÇÃO TOTAL, HORÁRIO (mm)</th>
+<th data-quarto-table-cell-role="th">TEMPERATURA MÁXIMA NA HORA ANT. (AUT) (°C)</th>
+<th data-quarto-table-cell-role="th">TEMPERATURA MÍNIMA NA HORA ANT. (AUT) (°C)</th>
+<th data-quarto-table-cell-role="th">TEMPERATURA_MEDIANA_DIA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2007-01-01</td>
+<td>0.0</td>
+<td>25.40</td>
+<td>24.15</td>
+<td>24.750</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2007-02-01</td>
+<td>0.0</td>
+<td>24.80</td>
+<td>23.40</td>
+<td>24.050</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2007-03-01</td>
+<td>0.0</td>
+<td>23.70</td>
+<td>22.60</td>
+<td>23.250</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2007-04-01</td>
+<td>0.0</td>
+<td>21.80</td>
+<td>20.80</td>
+<td>21.350</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2007-05-01</td>
+<td>0.0</td>
+<td>14.20</td>
+<td>12.80</td>
+<td>13.450</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">187</td>
+<td>2022-08-01</td>
+<td>0.0</td>
+<td>15.60</td>
+<td>14.30</td>
+<td>14.950</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">188</td>
+<td>2022-09-01</td>
+<td>0.0</td>
+<td>15.80</td>
+<td>14.60</td>
+<td>15.300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">189</td>
+<td>2022-10-01</td>
+<td>0.0</td>
+<td>18.60</td>
+<td>17.30</td>
+<td>17.950</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">190</td>
+<td>2022-11-01</td>
+<td>0.0</td>
+<td>22.40</td>
+<td>20.80</td>
+<td>21.625</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">191</td>
+<td>2022-12-01</td>
+<td>0.0</td>
+<td>26.05</td>
+<td>24.35</td>
+<td>25.225</td>
+</tr>
+</tbody>
+</table>
+
+<p>192 rows × 5 columns</p>
+</div>
+</div>
+</div>
+<div id="112deba3" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando df para os dados da temperatura mediana mensal da cidade de Alegrete</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana <span class="op">=</span> df_temp_mes[[<span class="st">'DATA (YYYY-MM-DD)'</span>, <span class="st">'TEMPERATURA_MEDIANA_DIA'</span>]].copy()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana.columns <span class="op">=</span> [<span class="st">'Data de Referência'</span>, <span class="st">'Temperatura Mediana (°C)'</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Data de Referência</th>
+<th data-quarto-table-cell-role="th">Temperatura Mediana (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2007-01-01</td>
+<td>24.75</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2007-02-01</td>
+<td>24.05</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2007-03-01</td>
+<td>23.25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2007-04-01</td>
+<td>21.35</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2007-05-01</td>
+<td>13.45</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="plotando-o-gráfico-da-temperatura-mediana-mensal-de-alegrete-2007-2022" class="level3">
+<h3 class="anchored" data-anchor-id="plotando-o-gráfico-da-temperatura-mediana-mensal-de-alegrete-2007-2022">Plotando o gráfico da temperatura mediana mensal de Alegrete (2007-2022):</h3>
+<div id="2d1e8ce9" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurando o estilo do Seaborn</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando um gráfico de linha da temperatura mediana mensal</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">7</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data<span class="op">=</span>alegrete_temp_mediana, x<span class="op">=</span><span class="st">'Data de Referência'</span>, y<span class="op">=</span><span class="st">'Temperatura Mediana (°C)'</span>, label<span class="op">=</span><span class="st">'Temperatura Mediana Mensal'</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurando rótulos e título</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Data de Referência'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperatura (°C)'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Temperatura Mediana Mensal de Alegrete (2007-2022)'</span>, pad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustando os ticks do eixo x para exibir semestralmente</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>locator <span class="op">=</span> MonthLocator(bymonthday<span class="op">=</span><span class="dv">1</span>, interval<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_locator(locator)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_formatter(DateFormatter(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st">'</span>))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>plt.xticks(pd.date_range(start<span class="op">=</span><span class="st">'2007-01-01'</span>, end<span class="op">=</span><span class="st">'2023-01-01'</span>, freq<span class="op">=</span><span class="st">'6MS'</span>), rotation<span class="op">=</span><span class="dv">65</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>, <span class="dv">30</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Alegrete_files/figure-html/cell-9-output-1.png" width="1424" height="656" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="83935b0d" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Salvando o DataFrame em um arquivo CSV para uso futuro</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana.to_csv(<span class="st">'alegrete_temp_mediana.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="945b7c53" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Agregando os dados semestrais para temperatura mediana</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_temp_semestre <span class="op">=</span> df_final[df_final[<span class="st">'TEMPERATURA_MEDIANA_DIA'</span>] <span class="op">&gt;=</span> <span class="dv">0</span>].resample(<span class="st">'6MS'</span>, on<span class="op">=</span><span class="st">'DATA (YYYY-MM-DD)'</span>).median().reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="81e2fedd" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando df para os dados da temperatura mediana semestral de Alegrete</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana_sem <span class="op">=</span> df_temp_semestre[[<span class="st">'DATA (YYYY-MM-DD)'</span>, <span class="st">'TEMPERATURA_MEDIANA_DIA'</span>]].copy()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana_sem.columns <span class="op">=</span> [<span class="st">'Data de Referência'</span>, <span class="st">'Temperatura Mediana (°C)'</span>]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>alegrete_temp_mediana_sem.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Data de Referência</th>
+<th data-quarto-table-cell-role="th">Temperatura Mediana (°C)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2007-01-01</td>
+<td>21.45</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2007-07-01</td>
+<td>18.65</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2008-01-01</td>
+<td>20.45</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2008-07-01</td>
+<td>18.40</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2009-01-01</td>
+<td>20.65</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="plotando-o-gráfico-da-temperatura-mediana-semestral-de-alegrete-2007-2022" class="level3">
+<h3 class="anchored" data-anchor-id="plotando-o-gráfico-da-temperatura-mediana-semestral-de-alegrete-2007-2022">Plotando o gráfico da temperatura mediana semestral de Alegrete (2007-2022):</h3>
+<div id="541ebe48" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurando o estilo do Seaborn</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando um gráfico de linha da temperatura mediana semestral</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">7</span>))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data<span class="op">=</span>alegrete_temp_mediana_sem, x<span class="op">=</span><span class="st">'Data de Referência'</span>, y<span class="op">=</span><span class="st">'Temperatura Mediana (°C)'</span>, label<span class="op">=</span><span class="st">'Temperatura Mediana Semestral'</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurando rótulos e título</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Data de Referência'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Temperatura (°C)'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Temperatura Mediana Semestral de Alegrete (2007-2022)'</span>, pad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustando os ticks do eixo x para exibir semestralmente</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>locator <span class="op">=</span> MonthLocator(bymonthday<span class="op">=</span><span class="dv">1</span>, interval<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_locator(locator)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_formatter(DateFormatter(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st">'</span>))</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>plt.xticks(pd.date_range(start<span class="op">=</span><span class="st">'2007-01-01'</span>, end<span class="op">=</span><span class="st">'2023-01-01'</span>, freq<span class="op">=</span><span class="st">'6MS'</span>), rotation<span class="op">=</span><span class="dv">65</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>, <span class="dv">30</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Alegrete_files/figure-html/cell-13-output-1.png" width="1424" height="656" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="e65ddd2b" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtrando os dados de precitação e agrupando por mês</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_precipitacao_mes <span class="op">=</span> df_final[df_final[<span class="st">'PRECIPITAÇÃO TOTAL, HORÁRIO (mm)'</span>] <span class="op">&gt;=</span> <span class="dv">0</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>df_precipitacao_mes <span class="op">=</span> df_precipitacao_mes.resample(<span class="st">'MS'</span>, on<span class="op">=</span><span class="st">'DATA (YYYY-MM-DD)'</span>).<span class="bu">sum</span>().reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="2bea92ce" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando df para os dados de pluviosidade mensal de Alegrete</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>alegrete_precipitacao <span class="op">=</span> df_precipitacao_mes[[<span class="st">'DATA (YYYY-MM-DD)'</span>, <span class="st">'PRECIPITAÇÃO TOTAL, HORÁRIO (mm)'</span>]].copy()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>alegrete_precipitacao.columns <span class="op">=</span> [<span class="st">'Data de Referência'</span>, <span class="st">'Precipitação (mm)'</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>alegrete_precipitacao</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Data de Referência</th>
+<th data-quarto-table-cell-role="th">Precipitação (mm)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2007-01-01</td>
+<td>86.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2007-02-01</td>
+<td>208.6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2007-03-01</td>
+<td>196.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2007-04-01</td>
+<td>112.8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2007-05-01</td>
+<td>46.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">187</td>
+<td>2022-08-01</td>
+<td>37.2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">188</td>
+<td>2022-09-01</td>
+<td>51.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">189</td>
+<td>2022-10-01</td>
+<td>73.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">190</td>
+<td>2022-11-01</td>
+<td>77.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">191</td>
+<td>2022-12-01</td>
+<td>74.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>192 rows × 2 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="plotando-o-gráfico-da-precipitação-mensal-de-alegrete-2007-2022" class="level3">
+<h3 class="anchored" data-anchor-id="plotando-o-gráfico-da-precipitação-mensal-de-alegrete-2007-2022">Plotando o gráfico da precipitação mensal de Alegrete (2007-2022):</h3>
+<div id="96cf0ce1" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando um gráfico de linha da pluviosidade mensal</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">7</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data<span class="op">=</span>alegrete_precipitacao, x<span class="op">=</span><span class="st">'Data de Referência'</span>, y<span class="op">=</span><span class="st">'Precipitação (mm)'</span>, label<span class="op">=</span><span class="st">'Precipitação (mm)'</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Configurando rótulos e título</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Data de Referência'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precipitação (mm)'</span>, labelpad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Precipitação Mensal em Alegrete (2007-2022)'</span>, pad<span class="op">=</span><span class="dv">12</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustando os ticks do eixo x para exibir semestralmente</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>locator <span class="op">=</span> MonthLocator(bymonthday<span class="op">=</span><span class="dv">1</span>, interval<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_locator(locator)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>plt.gca().xaxis.set_major_formatter(DateFormatter(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st">'</span>))</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>plt.xticks(pd.date_range(start<span class="op">=</span><span class="st">'2007-01-01'</span>, end<span class="op">=</span><span class="st">'2023-01-01'</span>, freq<span class="op">=</span><span class="st">'6MS'</span>), rotation<span class="op">=</span><span class="dv">65</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="dv">0</span>, <span class="dv">550</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Alegrete_files/figure-html/cell-16-output-1.png" width="1424" height="657" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="532b76e0" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Salvando o DataFrame em um arquivo CSV para uso futuro</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>alegrete_precipitacao.to_csv(<span class="st">'alegrete_precipitacao.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
