@@ -37,21 +37,13 @@ st.write(analise_economica)
 
 # dados exportados do site da vinícola
 
-try:
-    st.write('Trying with back slashes')
-    st.dataframe(pd.read_csv(r'.\\ExpVinho.csv'))
-except:
-    st.write('It didn\'t work with back slashes.')
+st.dataframe(pd.read_csv(r'.\\ExpVinho.csv'))
 
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
 # Dash: Country Profile; Dimension: Population aged 20 and over (thousands); Período: 2008 - 2022
 
-try:
-    st.write('Trying with back slashes')
-    st.dataframe(pd.read_csv(r'.\\Demografico_Pop_Idade_20_mais.xlsx'))
-except:
-    st.write('It didn\'t work with back slashes.')
+st.dataframe(pd.read_csv(r'.\\Demografico_Pop_Idade_20_mais.xlsx'))
 
 # Carregando o arquivo
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://www.paho.org/en/enlace/alcohol-consumption
