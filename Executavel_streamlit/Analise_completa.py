@@ -39,11 +39,27 @@ st.write(analise_economica)
 
 file = st.file_uploader("ExpVinho.csv", type=["csv"])
 
+# Verifica se o arquivo foi carregado com sucesso
+if file is not None:
+    # Lê o arquivo CSV
+    df = pd.read_csv(file, sep=";")
+
+    # Exibe o arquivo CSV
+    st.write(file)
+    
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://opendata.paho.org/en/core-indicators/core-indicators-dashboard
 # Home Core Indicators
 # Dash: Country Profile; Dimension: Population aged 20 and over (thousands); Período: 2008 - 2022
 
-df_demografico_pop_20_mais = pd.read_excel(r'Demografico_Pop_Idade_20_mais.csv')
+file1 = st.file_uploader("Demografico_Pop_Idade_20_mais.xlsx", type=["xlsx"])
+
+# Verifica se o arquivo foi carregado com sucesso
+if file1 is not None:
+    # Lê o arquivo CSV
+    df = pd.read_excel(file1)
+
+    # Exibe o arquivo CSV
+    st.write(file1)
 
 # Carregando o arquivo
 # dado demográfico do paraguay - popuplação +20 anos - fonte https://www.paho.org/en/enlace/alcohol-consumption
