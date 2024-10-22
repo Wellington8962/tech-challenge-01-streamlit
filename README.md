@@ -4,11 +4,10 @@ Repositório do aplicativo Streamlit para o 1º Tech Challenge da FIAP. O objeti
 
 ## Instruções para Executar o Projeto Streamlit
 **1.** Certifique-se de ter o Python 3.x instalado e configurado no seu computador.<br/>
-**2.** Crie e ative um ambiente virtual com o comando:
+**2.** Crie e ative um ambiente virtual para instalação de dependências com o comando:
    ```bash
    python3 -m venv venv
    ```
-   para criar um novo ambiente local para instalação de dependências.<br/>
 **3.** Para Linux, ative o ambiente virtual com:
    ```bash
    source venv/bin/activate
