@@ -1034,7 +1034,7 @@ st.subheader("Referências")
 
 referencias = """
 ***EMBRAPA. Dados da Vitivinicultura.***
-Disponível em: https://www.cnpuv.embrapa.br/vitibrazil/index.php?opcao=opt_01 - Acesso em 02 de novembro de 2024.
+Disponível em: https://www.cnpuv.embrapa.br/vitibrazil/index.php?opcao=opt_01 - Acesso em 02 de novembro de 2023.
 
 ***IPEA Data. Taxa de câmbio comercial para compra.***
 Disponível em: http://www.ipeadata.gov.br/ExibeSerie.aspx?serid=38590&module=M - Acesso em 02 de novembro de 2023.
