@@ -15,7 +15,11 @@ from io import StringIO
 from datetime import date
 from matplotlib.ticker import FuncFormatter
 
-titulo_principal = """
+# Importando as funções encapsuladas
+from funcoes_analise import carregar_dados, preparar_dados_exportacao, gerar_grafico_valor_exportado, gerar_grafico_quantidade_exportada, gerar_grafico_exportacao_pais, gerar_tabela_descritiva
+
+# Título principal
+titulo_principal = '''
 <h1 style="color: #5e9ca0;"><span style="background-color: #ffffff; color: #993366;">Clube Wine S.A.</span></h1>
 <h2><span style="background-color: #ffffff; color: #993366;">Departamento de Ci&ecirc;ncia de Dados</span></h2>
 <h2><span style="background-color: #ffffff; color: #993366;">_________________________________</span></h2>
@@ -23,658 +27,187 @@ titulo_principal = """
 <h1 style="color: #5e9ca0;"><span style="text-decoration: underline;">&Aacute;rea do Investidor</span> - An&aacute;lise da Viticultura do Rio Grande do Sul</h1>
 <p>&nbsp;</p>
 <pre style="color: #2e6c80;">Cientistas de Dados: Wellington, Andr&eacute;, Raphael, David, Lucas</pre>
-"""
+'''
 st.markdown(titulo_principal, unsafe_allow_html=True)
 
-# Título
+# Título da página
 st.title('Aspectos Macroeconômicos das Exportações de Vinho no Brasil')
-
 st.markdown("<br>", unsafe_allow_html=True)
 
-objetivo = """
+# Objetivo da análise
+objetivo = '''
 Nesta análise, você vai ver a macroeconomia das exportações de vinho do Rio Grande do Sul. O intuito é identificar os principais países importadores do nosso produto, avaliar a influência da taxa de câmbio do dólar sobre as exportações e examinar as condições climáticas que justificam a posição dominante da nossa região, o Rio Grande do Sul, responsável por mais de 90% da produção de vinho no Brasil.
 Por fim, responder: É ainda interessante investir em vinho no Brasil?
-"""
+'''
 st.write(objetivo)
 
 st.subheader("Análise Econômica")
 
-analise_economica = """
+analise_economica = '''
 O propósito desta análise é identificar os principais mercados que importam os vinhos do Brasil, destacando as nações que são consideradas nossos principais clientes.
-"""
+'''
 st.write(analise_economica)
 
-# CARREGANDO ARQUIVOS A SEREM UTILIZADOS
+# Carregando os dados utilizando a função encapsulada
+caminhos = [
+    "ExpVinho.csv", 
+    "Consumo_Alcool_Paraguay_EUA.csv", 
+    "Viticultura_brasileira.csv", 
+    "import_vinhos_br.csv", 
+    "TAXA_CAMBIO_HISTORICO.csv", 
+    "analise_mediana_mensal.csv", 
+    "analise_precipitacao_mensal.csv"
+]
+dados_vinho, df_consumo_alcool, df_br_estado_producao, dados_import_vinhos, dados_cambio, analise_mediana_mensal, analise_precipitacao_mensal = carregar_dados(caminhos)
 
-caminho = "ExpVinho.csv"
-df = pd.read_csv(caminho, sep=";") 
+# Preparando os dados de exportação
+anos = list(range(2008, 2023))
+total_vinho_pais, final_data_vinho = preparar_dados_exportacao(dados_vinho, anos)
 
-dados_vinho = pd.read_csv(caminho, sep=";") 
-
-caminho2 = "Consumo_Alcool_Paraguay_EUA.csv"
-df_consumo_alcool_litros_paraguay_eua = pd.read_csv(caminho2, sep=";") 
-
-caminho3 = "Viticultura_brasileira.csv"
-df_br_estado_producao_uvas_ton = pd.read_csv(caminho3, sep=";") 
-
-caminho4 = "import_vinhos_br.csv"
-dados_import_vinhos_br = pd.read_csv(caminho4, sep=";")
-
-caminho5 = "TAXA_CAMBIO_HISTORICO.csv"
-dados = pd.read_csv(caminho5, encoding='ISO-8859-1', skiprows=0, sep=';', skipfooter=12, thousands='.', decimal=',', engine ="python")
-
-caminho6 = "analise_mediana_mensal.csv"
-analise_mediana_mensal = pd.read_csv(caminho6, parse_dates=["Data de Referência"])
-
-caminho7 = "analise_precipitacao_mensal.csv"
-analise_precipitacao_mensal = pd.read_csv(caminho7, parse_dates=["Data de Referência"])
-
-# TRATAMENTO DE DADOS
-years = list(range(2008, 2023))
-
-# Criando listas vazias
-paises_vinho = []
-anos_vinho = []
-quantidades_vinho = []
-valores_vinho = []
-
-# Iterando pelos dados para preencher as listas
-for index, row in df.iterrows():
-    for year in years:
-        paises_vinho.append(row['País'])
-        anos_vinho.append(year)
-        quantidades_vinho.append(row[str(year)])
-        valores_vinho.append(row[str(year) + '.1'])
-
-# Criando o dataframe reformatado
-final_data_vinho = pd.DataFrame({
-    'País': paises_vinho,
-    'Ano': anos_vinho,
-    'Quantidade': quantidades_vinho,
-    'ValorUSD': valores_vinho
-})
-
-# Calculando o valor total exportado e a quantidade para cada país ao longo do período de 15 anos para o novo conjunto de dados
-total_vinho_pais = final_data_vinho.groupby('País').agg({'Quantidade': 'sum', 'ValorUSD': 'sum'}).reset_index()
-
-# Ordenando os países pelo VALOR exportado
+# Ordenando os países pelo valor exportado
 total_vinho_pais_sorted = total_vinho_pais.sort_values(by='ValorUSD', ascending=False)
 
-# Calculando o valor total exportado e a quantidade para cada país ao longo do período de 15 anos para o novo conjunto de dados
-total_vinho_pais = final_data_vinho.groupby('País').agg({'Quantidade': 'sum', 'ValorUSD': 'sum'}).reset_index()
-
-# Ordenando os países pelo VOLUME exportado
-total_vinho_pais_sorted_by_volume = total_vinho_pais.sort_values(by='Quantidade', ascending=False)
-
+# Exibindo a análise gráfica
 st.subheader("Valores Acumulados para Exportação em Dólar e Volume (litros)")
-
-valores_acumulados = """
+valores_acumulados = '''
 Com o objetivo de identificar os principais destinos das exportações dos produtos vitivinícolas brasileiros, elaborou-se um gráfico que representa o valor consolidado exportado em dólares para diferentes países durante o período de 2008 a 2022. Observa-se que Paraguai, Rússia, Estados Unidos e China destacam-se como os principais destinos, evidenciando a relevância dessas nações para o setor.
-"""
+'''
 st.write(valores_acumulados)
 
-# Configurando o estilo
-sns.set_style("whitegrid")
+# Gerar o gráfico de valor exportado utilizando a função encapsulada
+gerar_grafico_valor_exportado(total_vinho_pais_sorted)
 
-# Criando a visualização no Streamlit
-st.subheader('Ranking de Países por Valor Exportado (USD) entre 2008-2022')
+# Continuar ajustando conforme as funções encapsuladas
+# Ordenando os países pelo volume exportado
+total_vinho_pais_sorted_by_volume = total_vinho_pais.sort_values(by='Quantidade', ascending=False)
 
-# Plotando os 10 principais países por valor de exportação
-fig, ax = plt.subplots(figsize=(8, 10))
-sns.barplot(x='ValorUSD', y='País', data=total_vinho_pais_sorted.head(20), palette='viridis', ax=ax)
-ax.set(xlabel='Valor Total Exportado (USD)', ylabel='País')
-ax.xaxis.labelpad = 20
-
-# Formatando o eixo x para mostrar valores com vírgula e sem casas decimais
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.xaxis.set_major_formatter(formatter)
-
-# Adicionando rótulos numéricos para cada barra
-for index, value in enumerate(total_vinho_pais_sorted.head(10)['ValorUSD']):
-    ax.text(value, index, f'{value:,.0f}', ha='left', va='center', fontsize=10, color='black')
-
-ax.set_xlim(0, 45000000)
-ax.set_xticks([0, 10000000, 20000000, 30000000, 40000000])  
-plt.xticks(rotation=45)
-plt.tight_layout()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-volume_total_exportado = """
-Da mesma forma, criou-se um gráfico que apresenta o volume total exportado para cada país, expresso em litros. Nota-se que Rússia, Paraguai, Estados Unidos e China mantêm-se no topo da lista. Dessa maneira, podemos categorizar esses países como os principais clientes, reforçando sua significativa importância no contexto das exportações de produtos vitivinícolas.
-"""
-st.write(volume_total_exportado)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# Configurando o estilo
-sns.set_style("whitegrid")
-
-# Criando a visualização no Streamlit
 st.subheader('Ranking de Países por Quantidade Exportada (litros) entre 2008-2022')
 
-# Plotando os 10 principais países por valor de exportação
-fig, ax = plt.subplots(figsize=(8, 10))
-sns.barplot(x='Quantidade', y='País', data=total_vinho_pais_sorted_by_volume.head(20), palette='viridis', ax=ax)
-ax.set(xlabel='Valor Total de Exportação (Litros)', ylabel='País')
-ax.xaxis.labelpad = 20
-
-# Formatando o eixo x para mostrar valores com vírgula e sem casas decimais
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.xaxis.set_major_formatter(formatter)
-
-# Adicionando rótulos numéricos para cada barra
-for index, value in enumerate(total_vinho_pais_sorted_by_volume.head(20)['Quantidade']):
-    ax.text(value, index, f'{value:,.0f}', ha='left', va='center', fontsize=10, color='black')
-
-ax.set_xlim(0, 45000000)
-ax.set_xticks([0, 10000000, 20000000, 30000000, 40000000])  # Ajuste para os valores desejados no eixo x
-ax.legend(loc='upper left', bbox_to_anchor=(0.5, 0))
-plt.xticks(rotation=45)
-plt.tight_layout()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
+# Gerar o gráfico de quantidade exportada utilizando a função encapsulada
+gerar_grafico_quantidade_exportada(total_vinho_pais_sorted_by_volume)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-montante_acumulado_anual = """
-Ao realizar uma análise mais detalhada dos dados relativos aos cinco principais países, com base no ranking de valor exportado em dólares, apresentamos o gráfico a seguir. Este gráfico ilustra o montante acumulado anual exportado em dólares para essas nações. 
-
-Rússia chama a atenção em 2009 e 2013, por ter um pico bem acima dos demais, contudo 2016 e 2019 não houve exportação para esse país.
-
-Já o Paraguai se destaca como o país que consistentemente amplia seu consumo. Ano após ano, observamos um aumento do valor exportado.
-
-Estados Unidos, China e Reino Unido oscilam, mas não demonstram uma taxa de crescimento na exportação.
-"""
-st.write(montante_acumulado_anual)
-
-# Lista de países
+# Lista dos cinco principais países por valor exportado
 lista_paises = total_vinho_pais_sorted.head(5)['País'].tolist()
-top_paises_vinho = lista_paises
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
+filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(lista_paises)]
 
-# Criando a visualização no Streamlit
 st.subheader('Exportação de Vinho Brasileiro para os 5 Principais Países (2008-2022)')
 
-# Plotando a tendência anual para os 3 principais países
-fig, ax = plt.subplots(figsize=(8, 6))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="magma", linewidth=1, ax=ax)
-ax.set(xlabel='Ano', ylabel='Valor de Exportação (USD)')
-ax.xaxis.labelpad = 20
-ax.yaxis.labelpad = 20
+# Gerar gráfico de exportação por país utilizando a função encapsulada
+gerar_grafico_exportacao_pais(filtro_data_vinho, 'ValorUSD', 'Valor de Exportação (USD)')
+# Continuando a modularização para as próximas seções
 
-# Formatando o eixo y para mostrar valores com vírgula e sem casas decimais
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
+# Exibindo a análise de volume exportado
+st.subheader("Volume Total Exportado para Cada País (2008-2022)")
+volume_total_exportado = '''
+Da mesma forma, criou-se um gráfico que apresenta o volume total exportado para cada país, expresso em litros. Nota-se que Rússia, Paraguai, Estados Unidos e China mantêm-se no topo da lista. Dessa maneira, podemos categorizar esses países como os principais clientes, reforçando sua significativa importância no contexto das exportações de produtos vitivinícolas.
+'''
+st.write(volume_total_exportado)
 
-ax.set_ylim(0, 15500000)
-ax.set_yticks(np.arange(0, 15500000, 500000))
-ax.legend(loc='upper left', bbox_to_anchor=(0, 1))
+# Gerando o gráfico de volume exportado utilizando a função encapsulada
+gerar_grafico_quantidade_exportada(total_vinho_pais_sorted_by_volume)
 
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
+# Exibindo a análise de exportação detalhada para os 5 principais países
+st.subheader("Exportação Detalhada por País (2008-2022)")
+montante_acumulado_anual = '''
+Ao realizar uma análise mais detalhada dos dados relativos aos cinco principais países, com base no ranking de valor exportado em dólares, apresentamos o gráfico a seguir. Este gráfico ilustra o montante acumulado anual exportado em dólares para essas nações.
+'''
+st.write(montante_acumulado_anual)
 
-# Adicionando rótulo apenas para o país "Paraguai"
-pais = "Paraguai"
-linha = filtro_data_vinho[filtro_data_vinho['País'] == pais]
-ultimo_valor = linha['ValorUSD'].iloc[-1]
-ax.annotate(f'{pais} - {ultimo_valor:,.0f}', 
-            xy=(linha['Ano'].iloc[-1], ultimo_valor),
-            xytext=(0, 60), 
-            textcoords='offset points',
-            ha='left', va='center',
-            color=ax.get_lines()[top_paises_vinho.index(pais)].get_c(), rotation=90)
-
-plt.tight_layout()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-analise_volumetrica = """
-Realizando uma análise volumétrica, destacamos os mais bem rankeados: China, Estados Unidos, Paraguai, Reino Unido e Rússia. Em particular, nos anos de 2009 e 2013, observamos um notável aumento no consumo de nossos vinhos pela Rússia, coincidindo com o pico no gráfico monetário apresentado anteriormente.
-
-Como na análise monetária anterior, Paraguai se destaca como o único país que consistentemente amplia seu consumo de nossos vinhos. Ano após ano, observamos um aumento na quantidade importada por esse país.
-"""
-st.write(analise_volumetrica)
-
-# Criando a visualização no Streamlit
-st.subheader('Exportação em litros para os Países Selecionados (2008-2022)')
-
-# Selecionando os 5 principais países
+# Selecionando os 5 principais países e filtrando os dados
 lista_paises = total_vinho_pais_sorted.head(5)['País'].tolist()
-top_paises_vinho = lista_paises
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
+filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(lista_paises)]
 
-# Plotando a tendência anual para os 3 principais países
-fig, ax = plt.subplots(figsize=(6, 6))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='Quantidade', hue='País', marker="o", palette="magma", linewidth=1, ax=ax)
-ax.set(xlabel='Ano', ylabel='Quantidade (L)')
-ax.xaxis.labelpad = 20
-ax.yaxis.labelpad = 20
+# Gerando o gráfico de exportação por país para os 5 principais países
+gerar_grafico_exportacao_pais(filtro_data_vinho, 'ValorUSD', 'Valor de Exportação (USD)')
 
-# Formatando o eixo y para mostrar valores com vírgula e sem casas decimais
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-ax.set_ylim(0, 23000000)
-ax.set_yticks(np.arange(0, 23000000, 1000000))
-ax.legend(title='País', fontsize=12)
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulo apenas para o país "Paraguai"
-pais = "Paraguai"
-linha = filtro_data_vinho[filtro_data_vinho['País'] == pais]
-ultimo_valor = linha['Quantidade'].iloc[-1]
-ax.annotate(f'{pais} - {ultimo_valor:,.0f}', 
-            xy=(linha['Ano'].iloc[-1], ultimo_valor),
-            xytext=(0, 60), 
-            textcoords='offset points',
-            ha='left', va='center',
-            color=ax.get_lines()[top_paises_vinho.index(pais)].get_c(), rotation=90)
-
-plt.tight_layout()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
+# Análise dos principais países
 st.markdown("<br>", unsafe_allow_html=True)
+st.subheader("Análise dos Principais Países Exportadores")
 
-st.subheader("Um olhar para o top 5 em valor exportado")
-
-st.markdown(
-    "<div style='font-size: 23px; font-weight: bold;'>1. Paraguai</div>",
-    unsafe_allow_html=True
-)
-
-paraguai = """
+# Paraguai
+st.markdown("<div style='font-size: 23px; font-weight: bold;'>1. Paraguai</div>", unsafe_allow_html=True)
+paraguai = '''
 As exportações para o Paraguai têm aumentado consistentemente ao longo dos anos, com um pico notável em 2021.
 Dado o crescimento sustentado nas exportações para o Paraguai, é recomendado fortalecer as relações comerciais e explorar oportunidades para diversificar a oferta de produtos.
-"""
+'''
 st.write(paraguai)
 
-# Supondo que total_vinho_pais_sorted é o seu DataFrame
-lista_paises = ["Paraguai"]
+# Exportação Paraguai
+filtro_data_paraguai = final_data_vinho[final_data_vinho['País'] == 'Paraguai']
+gerar_grafico_exportacao_pais(filtro_data_paraguai, 'ValorUSD', 'Valor de Exportação (USD)')
 
-top_paises_vinho = lista_paises 
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
-
-# Configurando o estilo do Seaborn
-sns.set(style="whitegrid")
-
-# Criando o gráfico no Streamlit 
-fig, ax = plt.subplots(figsize=(11, 7))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="viridis", linewidth=2.5, ax=ax)
-plt.xlabel('Ano', fontsize=12)
-plt.ylabel('Valor de Exportação (USD)', fontsize=14, labelpad=20)
-plt.title('Exportações para Paraguai (2008-2022)', fontsize=16)
-plt.legend(title='País', fontsize=12, loc='upper left')
-
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-plt.ylim(0, 10000000)
-plt.yticks(np.arange(0, 10000000, 1000000))
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulos ponto a ponto
-for index, row in filtro_data_vinho.iterrows():
-    pais = row['País']
-    ano = row['Ano']
-    valor = row['ValorUSD']
-
-    # Adicionando o rótulo ao ponto no gráfico com rotação de 45 graus
-    plt.annotate(f'{pais}: ${valor:,.0f}', xy=(ano, valor), xytext=(0, 60),
-                 textcoords='offset points', fontsize=8, color='black', ha='left', va='center', rotation=90)
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown(
-    "<div style='font-size: 23px; font-weight: bold;'>2. Estados Unidos</div>",
-    unsafe_allow_html=True
-)
-
-estados_unidos = """
+# Estados Unidos
+st.markdown("<div style='font-size: 23px; font-weight: bold;'>2. Estados Unidos</div>", unsafe_allow_html=True)
+estados_unidos = '''
 As exportações para os EUA têm mostrado uma oscilação, mas não uma tendência de crescimento neste mercado.
 O mercado dos EUA tem potencial de crescimento. A recomendação é considerar campanhas de marketing e promoções para aumentar a visibilidade e aceitação do vinho brasileiro nos EUA.
-"""
+'''
 st.write(estados_unidos)
 
-# Supondo que total_vinho_pais_sorted é o seu DataFrame
-lista_paises = ["Estados Unidos"]
+# Exportação EUA
+filtro_data_eua = final_data_vinho[final_data_vinho['País'] == 'Estados Unidos']
+gerar_grafico_exportacao_pais(filtro_data_eua, 'ValorUSD', 'Valor de Exportação (USD)')
 
-top_paises_vinho = lista_paises 
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
-
-# Configurando o estilo do Seaborn
-sns.set(style="whitegrid")
-
-# Criando o gráfico no Streamlit 
-fig, ax = plt.subplots(figsize=(10, 7))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="viridis", linewidth=2.5, ax=ax)
-plt.xlabel('Ano', fontsize=12)
-plt.ylabel('Valor de Exportação (USD)', fontsize=14, labelpad=20)
-plt.title('Exportações para EUA (2008-2022)', fontsize=16)
-plt.legend(title='País', fontsize=12, loc='upper left')
-
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-plt.ylim(0, 4000000)
-plt.yticks(np.arange(0, 4000000, 1000000))
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulos ponto a ponto
-for index, row in filtro_data_vinho.iterrows():
-    pais = row['País']
-    ano = row['Ano']
-    valor = row['ValorUSD']
-
-    # Adicionando o rótulo ao ponto no gráfico com rotação de 45 graus
-    plt.annotate(f'{pais}: ${valor:,.0f}', xy=(ano, valor), xytext=(0, 60),
-                 textcoords='offset points', fontsize=8, color='black', ha='left', va='center', rotation=90)
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown(
-    "<div style='font-size: 23px; font-weight: bold;'>3. Rússia</div>",
-    unsafe_allow_html=True
-)
-
-russia = """
+# Rússia
+st.markdown("<div style='font-size: 23px; font-weight: bold;'>3. Rússia</div>", unsafe_allow_html=True)
+russia = '''
 As exportações para a Rússia apresentam certa imprevisibilidade. Em 2013, aparentemente estávamos conquistando espaço no mercado, porém a partir de 2014 tivemos resultados ruins.
-A partir de 2020 houveram novas importações, porém ainda não muito promissoras.
-"""
+A partir de 2020 houve novas importações, porém ainda não muito promissoras.
+'''
 st.write(russia)
 
-# Supondo que total_vinho_pais_sorted é o seu DataFrame
-lista_paises = ["Rússia"]
+# Exportação Rússia
+filtro_data_russia = final_data_vinho[final_data_vinho['País'] == 'Rússia']
+gerar_grafico_exportacao_pais(filtro_data_russia, 'ValorUSD', 'Valor de Exportação (USD)')
 
-top_paises_vinho = lista_paises 
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
-
-# Configurando o estilo do Seaborn
-sns.set(style="whitegrid")
-
-# Criando o gráfico no Streamlit
-fig, ax = plt.subplots(figsize=(13, 10))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="viridis", linewidth=2.5, ax=ax)
-plt.xlabel('Ano', fontsize=14)
-plt.ylabel('Valor de Exportação (USD)', fontsize=14, labelpad=20)
-plt.title('Exportações para Rússia (2008-2022)', fontsize=14)
-plt.legend(title='País', fontsize=14)
-
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-plt.ylim(-1000000, 17000000)
-plt.yticks(np.arange(0, 17000000, 1000000))
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulos ponto a ponto
-for index, row in filtro_data_vinho.iterrows():
-    pais = row['País']
-    ano = row['Ano']
-    valor = row['ValorUSD']
-
-    # Adicionando o rótulo ao ponto no gráfico com rotação de 60 graus
-    plt.annotate(f'{pais}: ${valor:,.0f}', xy=(ano, valor), xytext=(0, 30),
-                 textcoords='offset points', fontsize=8, color='black', ha='left', va='center', rotation=60)
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown(
-    "<div style='font-size: 23px; font-weight: bold;'>4. China</div>",
-    unsafe_allow_html=True
-)
-
-china = """
+# China
+st.markdown("<div style='font-size: 23px; font-weight: bold;'>4. China</div>", unsafe_allow_html=True)
+china = '''
 Exportações para a China demonstração volatilidade e não apresenta tendência de crescimento. É um mercado que nunca passamos de US$ 642.177 (pico em 2012).
 Este mercado tem potencial de crescimento. A recomendação é considerar campanhas de marketing e promoções para aumentar a visibilidade e aceitação do vinho brasileiro.
-"""
+'''
 st.write(china)
 
-# Supondo que total_vinho_pais_sorted é o seu DataFrame
-lista_paises = ["China"]
+# Exportação China
+filtro_data_china = final_data_vinho[final_data_vinho['País'] == 'China']
+gerar_grafico_exportacao_pais(filtro_data_china, 'ValorUSD', 'Valor de Exportação (USD)')
 
-top_paises_vinho = lista_paises 
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
-
-# Configurando o estilo do Seaborn
-sns.set(style="whitegrid")
-
-# Criando o gráfico no Streamlit
-fig, ax = plt.subplots(figsize=(10, 7))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="viridis", linewidth=2.5, ax=ax)
-plt.xlabel('Ano', fontsize=12)
-plt.ylabel('Valor de Exportação (USD)', fontsize=14, labelpad=20)
-plt.title('Exportações para China (2008-2022)', fontsize=12)
-plt.legend(title='País', fontsize=12)
-
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-plt.ylim(0, 1000000)
-plt.yticks(np.arange(0, 1000000, 250000))
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulos ponto a ponto
-for index, row in filtro_data_vinho.iterrows():
-    pais = row['País']
-    ano = row['Ano']
-    valor = row['ValorUSD']
-
-    # Adicionando o rótulo ao ponto no gráfico com rotação de 45 graus
-    plt.annotate(f'{pais}: ${valor:,.0f}', xy=(ano, valor), xytext=(0, 50),
-                 textcoords='offset points', fontsize=8, color='black', ha='left', va='center', rotation=90)
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown(
-    "<div style='font-size: 23px; font-weight: bold;'>5. Reino Unido</div>",
-    unsafe_allow_html=True
-)
-
-reino_unido = """
-A análise das exportações do Reino Unido revela uma ausência de tendência de crescimento. Até 2013, alcançamos um patamar superior a 250 mil, atingindo um pico em 2014 com 1,3 milhões. No entanto, nos anos subsequentes, as vendas não mantiveram esse ritmo de crescimento. A partir de 2017, observamos declínios, e de 2019 a 2022 permanecemos abaixo da marca de 250 mil em exportações. 
-É um mercado que precisa de estimo de marketing e parcerias comerciais para alavancar mais vendas.
-"""
+# Reino Unido
+st.markdown("<div style='font-size: 23px; font-weight: bold;'>5. Reino Unido</div>", unsafe_allow_html=True)
+reino_unido = '''
+A análise das exportações do Reino Unido revela uma ausência de tendência de crescimento. Até 2013, alcançamos um patamar superior a 250 mil, atingindo um pico em 2014 com 1,3 milhões. No entanto, nos anos subsequentes, as vendas não mantiveram esse ritmo de crescimento.
+'''
 st.write(reino_unido)
 
-# Supondo que total_vinho_pais_sorted é o seu DataFrame
-lista_paises = ["Reino Unido"]
-
-top_paises_vinho = lista_paises 
-filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
-
-# Configurando o estilo do Seaborn
-sns.set(style="whitegrid")
-
-# Criando o gráfico no Streamlit
-fig, ax = plt.subplots(figsize=(10, 7))
-sns.lineplot(data=filtro_data_vinho, x='Ano', y='ValorUSD', hue='País', marker="o", palette="viridis", linewidth=2.5, ax=ax)
-plt.xlabel('Ano', fontsize=12)
-plt.ylabel('Valor de Exportação (USD)', fontsize=14, labelpad=20)
-plt.title('Exportações para Reino Unido (2008-2022)', fontsize=12)
-plt.legend(title='País', fontsize=12)
-
-formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-ax.yaxis.set_major_formatter(formatter)
-
-plt.ylim(0, 2500000)
-plt.yticks(np.arange(0, 2500000, 250000))
-
-# Ajustando os rótulos do eixo x para mostrar anos de um em um
-anos = filtro_data_vinho['Ano'].unique()
-ax.set_xticks(anos)
-ax.set_xticklabels(anos, rotation=45, ha='right')
-
-# Adicionando rótulos ponto a ponto
-for index, row in filtro_data_vinho.iterrows():
-    pais = row['País']
-    ano = row['Ano']
-    valor = row['ValorUSD']
-
-    # Adicionando o rótulo ao ponto no gráfico com rotação de 45 graus
-    plt.annotate(f'{pais}: ${valor:,.0f}', xy=(ano, valor), xytext=(0, 50),
-                 textcoords='offset points', fontsize=8, color='black', ha='left', va='center', rotation=90)
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Embrapa</div>",
-    unsafe_allow_html=True
-)
-
-st.subheader("Um olhar especial para o Rio Grande do Sul")
-
-principal_exportador = """
-O Rio Grande do Sul é o principal estado exportador de derivados de uva no Brasil, conforme evidenciado no gráfico abaixo, que apresenta dados de 2018 a 2021. O estado se destaca em todos os anos, com valores significativamente superiores aos demais.
-"""
-st.write(principal_exportador)
-
-st.markdown("<br>", unsafe_allow_html=True)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Clique na seta para expandir.</div>",
-    unsafe_allow_html=True
-)
-
-# Configuração da paleta de cores
-paleta = sns.color_palette("rocket_r", 24)
-
-# Configuração do tamanho total do gráfico
-fig, axes = plt.subplots(2, 2, figsize=(30, 12))
-
-# Loop para criar quatro subplots
-anos = ["ANO_2018", "ANO_2019", "ANO_2020", "ANO_2021"]
-
-for i, ano in enumerate(anos):
-    row, col = divmod(i, 2)
-    ax = axes[row, col]
-    
-    # Ordenar os dados por produção em ordem decrescente
-    sorted_data = df_br_estado_producao_uvas_ton.sort_values(by=ano, ascending=False)
-    
-    # Plotagem do gráfico de barras
-    sns.barplot(data=sorted_data, x="ESTADOS", y=ano, hue="ESTADOS", palette=paleta, errorbar=None, ax=ax)
-    
-    # Configurações adicionais para melhorar a apresentação
-    for bar, valor in zip(ax.patches, sorted_data[ano]):
-        color = sns.color_palette("rocket_r", as_cmap=True)(valor / sorted_data[ano].max())
-        bar.set_color(color)
-
-    ax.set_title(f"Produção de Uvas por Estado - {ano}")
-    ax.set_xlabel("Estados", fontsize=10)
-    ax.set_ylabel("Produção (toneladas)", fontsize=10)
-    ax.tick_params(axis='x', rotation=90)
-    
-    # Adiciona formatação de milhar com ponto no eixo y
-    formatter = ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x).replace(',', '.'))
-    ax.yaxis.set_major_formatter(formatter)
-
-# Ajustes de layout
-plt.tight_layout()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: Vitivinicultura Brasileira</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
+# Exportação Reino Unido
+filtro_data_reino_unido = final_data_vinho[final_data_vinho['País'] == 'Reino Unido']
+gerar_grafico_exportacao_pais(filtro_data_reino_unido, 'ValorUSD', 'Valor de Exportação (USD)')
 
 st.subheader("Análise de correlação entre taxa de câmbio e valor exportado")
 
-corr_cambio = """
-Essa análise econômica tem como objetivo verificar se a taxa de câmbio tem uma correlação com o valor exportado, em dólar, para os três principais países importadores de vinhos do Brasil.
-
-Mostraremos a taxa de câmbio do dólar, frente ao real brasileiro, entre 2008 a 2023, e calcularemos a correlação com o valor exportado de cada respectivo ano para Paraguai, Estados Unidos e Rússia, que são os países que mais importam nossos vinhos.
-
-Para a correlação, será utilizado a média da taxa de câmbio anual.
+tendencia_anual = """
+No 'Tendência Anual de Exportação de Vinho Brasileiro' vemos a tendência anual do valor exportado em dólar para os três principais importadores de produtos da viticultura brasileira: Estados Unidos, Paraguai e Rússia. Paraguai se destaca porque a partir de 2015 começa uma crescente de importação. Ano a ano há uma aumento, exceto em 2019 e 2020. Devido essa tendência crescente Paraguai é o nosso principal cliente.
 """
-st.write(corr_cambio)
+st.write(tendencia_anual)
 
 # RENOMEANDO COLUNAS
-primeira_coluna = dados.columns[0]
-dados = dados.rename(columns={primeira_coluna: 'datas'})
-segunda_coluna = dados.columns[1]
-dados = dados.rename(columns={segunda_coluna: 'cambio'})
-dados['datas'] = pd.to_datetime(dados['datas'], format='%d/%m/%Y')
+primeira_coluna = dados_cambio.columns[0]
+dados_cambio = dados_cambio.rename(columns={primeira_coluna: 'datas'})
+segunda_coluna = dados_cambio.columns[1]
+dados_cambio = dados_cambio.rename(columns={segunda_coluna: 'cambio'})
+dados_cambio['datas'] = pd.to_datetime(dados_cambio['datas'], format='%d/%m/%Y')
+
+# Converter a coluna 'cambio' para numérico, forçando valores inválidos a se tornarem NaN
+dados_cambio['cambio'] = pd.to_numeric(dados_cambio['cambio'], errors='coerce')
+
+# Remover valores NaN que possam ter surgido na conversão
+dados_filtrados = dados_cambio.dropna(subset=['cambio'])
 
 # Filtrando os dados para incluir apenas a partir de 2008
-dados_filtrados = dados[dados['datas'].dt.year >= 2008]
+dados_filtrados = dados_filtrados[dados_filtrados['datas'].dt.year >= 2008]
+
 # Extrair o ano da coluna 'datas'
 dados_filtrados = dados_filtrados.copy()
 dados_filtrados['ano'] = dados_filtrados['datas'].dt.year
@@ -707,42 +240,6 @@ final_data_vinho = pd.DataFrame({
     'Quantidade': quantidades_vinho,
     'ValorUSD': valores_vinho
 })
-
-variacao_cambio = """
-No 'Gráfico de Linha - Câmbio ao Longo do Tempo' abaixo mostra o valor da taxa de câmbio entre 2008 e 2023. Através dele podemos acompanhar a valorização do dólar (EUA) frente a moeda brasileira.
-"""
-st.write(variacao_cambio)
-
-# Criando o gráfico de linha usando o SeabornNO '
-fig, ax = plt.subplots(figsize=(8, 4))  
-sns.lineplot(x='datas', y='cambio', data=dados_filtrados, label="Valor do Dólar", ax=ax)
-ax.xaxis.set_major_locator(mdates.YearLocator())
-
-# Configurar os tiques do eixo x para mostrar todos os anos e rotacioná-los em 45 graus
-plt.xticks(rotation=45)
-
-# Adicione rótulos e título ao gráfico
-plt.xlabel('Data', labelpad=20)
-plt.ylabel('Valor do Dólar', labelpad=20)
-plt.title('Gráfico de Linha - Câmbio ao Longo do Tempo')
-
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.ylim(0, 7)
-plt.legend()
-
-# Exibindo o gráfico
-st.pyplot(fig)
-st.markdown(
-    "<div style='text-align: center; font-size: 13px;'>Fonte: IPEA Data</div>",
-    unsafe_allow_html=True
-)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-tendencia_anual = """
-No 'Tendência Anual de Exportação de Vinho Brasileiro' vemos a tendência anual do valor exportado em dólar para os três principais importadores de produtos da viticultura brasileira: Estados Unidos, Paraguai e Rússia. Paraguai se destaca porque a partir de 2015 começa uma crescente de importação. Ano a ano há uma aumento, exceto em 2019 e 2020. Devido essa tendência crescente Paraguai é o nosso principal cliente.
-"""
-st.write(tendencia_anual)
 
 top_paises_vinho = ['Paraguai', 'Rússia', 'Estados Unidos']
 filtro_data_vinho = final_data_vinho[final_data_vinho['País'].isin(top_paises_vinho)]
